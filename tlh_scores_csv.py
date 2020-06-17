@@ -6,10 +6,10 @@ seasons = ['2020', '2019', '2018', '2017']
 levels = ['ek', '1l', '2l', '3l', '4l', 'ol']
 
 
-def pitch_scores():
+def hall_scores():
     for season in seasons:
         for level in levels:
-            www = f"http://tlsp.pl/wyniki/{season}/lnb/b{level}/"
+            www = f"http://tlsp.pl/wynikihl/{season}/hlp/h{level}/"
             get_www = requests.get(www)
             source_www = get_www.content
             soup_www = BeautifulSoup(source_www, 'lxml')
@@ -17,7 +17,7 @@ def pitch_scores():
                 soup_www.find("div", class_="wiersz").contents[0]
                 pass
             except:
-                file_name = f"pitch_{season}_{level}"
+                file_name = f"hall_{season}_{level}"
                 with open(f"{file_name}.csv", "w", newline='') as file_with_results:
                     the_writer = csv.writer(file_with_results)
                     for result in soup_www.find_all("tr"):
@@ -30,7 +30,6 @@ def pitch_scores():
                             except:
                                 pass
                             the_writer.writerow([team_1, team_2, score_team_1, score_team_2])
-
 
 
 
