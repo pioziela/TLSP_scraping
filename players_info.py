@@ -42,6 +42,3 @@ def players():
                                     player_goals, player_yellow_cards, player_red_cards])
             player_id += 1
             print(player_id)
-
-
-players()
