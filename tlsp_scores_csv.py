@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import csv
 
-seasons = ['2020', '2019', '2018', '2017']
+seasons = ['2017', '2018', '2019', '2020']
 levels = ['ek', '1l', '2l', '3l', '4l', 'ol']
 
 

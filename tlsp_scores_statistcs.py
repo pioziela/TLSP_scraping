@@ -25,7 +25,9 @@ def team_statistics(data):
                                        columns=['Team', 'Matches', 'Points', 'Points/match', 'Wins',
                                                 'Draws', 'Losts', 'Wins %', 'Draws %', 'Losts %',
                                                 'Goals for', 'Goals against', 'Goals difference',
-                                                'Goals for/match', 'Goals against/match'])
+                                                'Goals for/match', 'Goals against/match', 'The longest series of wins',
+                                                'The longest series without lost', 'The longest series of losts',
+                                                'The longest series without win'])
     for team in teams:
         all_team_matches = data.loc[(data['Team 1'] == team) | (data['Team 2'] == team)]
         matches = len(all_team_matches)
@@ -48,14 +50,59 @@ def team_statistics(data):
                     all_team_matches.loc[all_team_matches['Team 2'] == team, 'Team 1 goals'].sum()
         goals_against_per_match = goals_against / matches
         goals_difference = goals_for - goals_against
+        win_series = 0
+        the_longest_win_series = 0
+        lost_series = 0
+        the_longest_lost_series = 0
+        series_without_lost = 0
+        the_longest_series_without_lost = 0
+        series_without_win = 0
+        the_longest_series_without_win = 0
+        for index, row in all_team_matches.iterrows():
+            if (row['Team 1'] == team and row['Team 1 goals'] > row['Team 2 goals']) or (row['Team 2'] == team and row['Team 2 goals'] > row['Team 1 goals']):
+                win_series += 1
+            else:
+                if win_series > the_longest_win_series:
+                    the_longest_win_series = win_series
+                win_series = 0
+            if (row['Team 1'] == team and row['Team 1 goals'] >= row['Team 2 goals']) or (row['Team 2'] == team and row['Team 2 goals'] >= row['Team 1 goals']):
+                series_without_lost += 1
+            else:
+                if series_without_lost > the_longest_series_without_lost:
+                    the_longest_series_without_lost = series_without_lost
+                series_without_lost = 0
+            if (row['Team 1'] == team and row['Team 1 goals'] < row['Team 2 goals']) or (row['Team 2'] == team and row['Team 2 goals'] < row['Team 1 goals']):
+                lost_series += 1
+            else:
+                if lost_series > the_longest_lost_series:
+                    the_longest_lost_series = lost_series
+                lost_series = 0
+            if (row['Team 1'] == team and row['Team 1 goals'] <= row['Team 2 goals']) or (row['Team 2'] == team and row['Team 2 goals'] <= row['Team 1 goals']):
+                series_without_win += 1
+            else:
+                if series_without_win > the_longest_series_without_win:
+                    the_longest_series_without_win = series_without_win
+                series_without_win = 0
+        if win_series > the_longest_win_series:
+            the_longest_win_series = win_series
+        if lost_series > the_longest_lost_series:
+            the_longest_lost_series = lost_series
+        if series_without_lost > the_longest_series_without_lost:
+            the_longest_series_without_lost = series_without_lost
+        if series_without_win > the_longest_series_without_win:
+            the_longest_series_without_win = series_without_win
         all_team_statistics_2 = pd.DataFrame([[team, matches, points, round(points_per_match,2), wins, draws, losts,
                                             round(win_percentage,0), round(draw_percentage,0), round(lost_percentage,0),
                                              goals_for, goals_against, goals_difference, round(goals_for_per_match,2),
-                                            round(goals_against_per_match,2)]],
+                                            round(goals_against_per_match,2), the_longest_win_series,
+                                               the_longest_series_without_lost, the_longest_lost_series,
+                                               the_longest_series_without_win]],
                                            columns=['Team', 'Matches', 'Points', 'Points/match', 'Wins',
                                                         'Draws', 'Losts', 'Wins %', 'Draws %', 'Losts %',
                                                         'Goals for', 'Goals against', 'Goals difference',
-                                                        'Goals for/match', 'Goals against/match'])
+                                                        'Goals for/match', 'Goals against/match',
+                                                    'The longest series of wins', 'The longest series without lost',
+                                                    'The longest series of losts', 'The longest series without win'])
         all_team_statistics = all_team_statistics.append(all_team_statistics_2, ignore_index=True)
     return all_team_statistics
 
