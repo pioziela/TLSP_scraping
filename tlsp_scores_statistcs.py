@@ -151,23 +151,8 @@ team_statistics(data_with_correct_team_names).to_csv(f"{pitch_or_hall}_tlsp_stat
 
 
 def general_statistics(data):
-    data_to_unique_score = []
-    data_to_the_same_teams_matches = []
-    for index, row in data.iterrows():
-        sorted_two_teams_list = sorted([row['Team 1'], row['Team 2']])
-        data_to_the_same_teams_matches.append(f"{sorted_two_teams_list[0]} vs {sorted_two_teams_list[1]}")
-        if row['Team 1 goals'] > row['Team 2 goals']:
-            data_to_unique_score.append(f"{row['Team 1 goals']}:{row['Team 2 goals']}")
-        elif row['Team 1 goals'] < row['Team 2 goals']:
-            data_to_unique_score.append(f"{row['Team 2 goals']}:{row['Team 1 goals']}")
-        elif row['Team 1 goals'] == row['Team 2 goals']:
-            data_to_unique_score.append(f"{row['Team 1 goals']}:{row['Team 2 goals']}")
-    data['Unique score'] = data_to_unique_score
-    data['Teams in alphabetical order'] = data_to_the_same_teams_matches
-    number_of_result = ['_' for i in range(len(data))]
-    data['Number of occurrences'] = number_of_result
-    the_same_team = ['_' for i in range(len(data))]
-    data['The most often played'] = the_same_team
+    data = unique_score(data)
+    data = the_same_teams(data)
     most_common_result = data.groupby('Unique score').count()[['Number of occurrences']]
     sorted_most_common_result = most_common_result.sort_values(by='Number of occurrences', ascending=False)
     most_often_played = data.groupby('Teams in alphabetical order').count()[['The most often played']]
@@ -175,7 +160,33 @@ def general_statistics(data):
     return sorted_most_often_played, sorted_most_common_result
 
 
-#often_played, common_result = general_statistics(data_with_correct_team_names)
+def unique_score(data_with_teams_matches):
+    data_to_unique_score = []
+    for index, row in data_with_teams_matches.iterrows():
+        if row['Team 1 goals'] > row['Team 2 goals']:
+            data_to_unique_score.append(f"{row['Team 1 goals']}:{row['Team 2 goals']}")
+        elif row['Team 1 goals'] < row['Team 2 goals']:
+            data_to_unique_score.append(f"{row['Team 2 goals']}:{row['Team 1 goals']}")
+        elif row['Team 1 goals'] == row['Team 2 goals']:
+            data_to_unique_score.append(f"{row['Team 1 goals']}:{row['Team 2 goals']}")
+    data_with_teams_matches['Unique score'] = data_to_unique_score
+    number_of_result = ['_' for i in range(len(data_with_teams_matches))]
+    data_with_teams_matches['Number of occurrences'] = number_of_result
+    return data_with_teams_matches
 
-#print(often_played)
-#print(common_result)
+
+def the_same_teams(data_with_team_matches):
+    data_to_the_same_teams_matches = []
+    for index, row in data_with_team_matches.iterrows():
+        sorted_two_teams_list = sorted([row['Team 1'], row['Team 2']])
+        data_to_the_same_teams_matches.append(f"{sorted_two_teams_list[0]} vs {sorted_two_teams_list[1]}")
+    data_with_team_matches['Teams in alphabetical order'] = data_to_the_same_teams_matches
+    the_same_team = ['_' for i in range(len(data_with_team_matches))]
+    data_with_team_matches['The most often played'] = the_same_team
+    return data_with_team_matches
+
+
+often_played, common_result = general_statistics(data_with_correct_team_names)
+
+print(often_played)
+print(common_result)
